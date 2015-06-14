@@ -1,6 +1,7 @@
 import itertools
 import bisect
 import random
+from mido import MetaMessage
 
 
 class NoteAccumulator(object):
@@ -10,10 +11,14 @@ class NoteAccumulator(object):
         self.notes = set()
 
     def read_event(self, event):
-        if event.type == 'note_on':
-            self.play(event.note)
-        elif event.type == 'note_off':
-            self.release(event.note)
+        if not isinstance(event, MetaMessage):
+            if event.type == 'note_on':
+                if event.velocity == 0:
+                    self.release(event.note)
+                else:
+                    self.play(event.note)
+            elif event.type == 'note_off':
+                self.release(event.note)
 
     def play(self, note):
         self.active.add(note)
@@ -27,8 +32,16 @@ class NoteAccumulator(object):
         self.notes = set()
         return notes
 
+    def pop_active(self):
+        active = self.active
+        self.active = set()
+        return active
+
     def is_playing(self):
         return len(self.active) > 0
+
+    def is_polyphonic(self):
+        return len(self.active) > 1
 
 
 class KeyMap(object):
