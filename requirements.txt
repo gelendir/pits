@@ -2,3 +2,5 @@ mido
 click
 requests
 python-levenshtein
+beautifulsoup4
+requests

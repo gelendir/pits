@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pits_play = pits.play:main',
+            'pits_scrape = pits.scrape:main',
         ]
     }
 )
