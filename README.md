@@ -48,8 +48,8 @@ By default, audio will be saved to ```audio.mp3```. You can change name of the
 file with ```--audio=filepath```
 
 
-Generating stats on note usage
-==============================
+Generating stats on note frequencies
+====================================
 
 As part of my ongoing exploration on how to make the sounds produced by PiTS
 more interesting, I have written small utilities to help me analyze the
@@ -63,11 +63,10 @@ Main steps to follow:
 3. Generate statistics on note frequencies for each score
 4. Combine all statistics together
 
-There are 2 scripts for accomplishing these steps: ```pits_scrape``` and
-```pits_stats```
+There are 2 scripts for accomplishing these steps: ```pits_scrape``` and ```pits_stats```
 
-1. Finding a catalog
-====================
+Finding a catalog
+-----------------
 
 First, you need to create somehow a catalog of scores to download and analyze.
 For now, ```pits_scrape``` only understands how to produce and download catalogs
@@ -81,8 +80,8 @@ you can use ```pits_scrape``` to automatically generate a JSON catalog:
     mkdir mutopia
     pits_scrape scrape search.html -o mutopia/catalog.json
 
-2. Download all scores
-======================
+Download all scores
+-------------------
 
 ***WARNING: In an effort to conserve the limited bandwidth of the Mutopia 
 Project, consider using a mirror to download scores instead of scraping the 
@@ -92,8 +91,8 @@ Download the catalog with the following command:
 
     pits_scrape download mutopia/catalog.json -o mutopia
 
-3. Generate statistics
-======================
+Generate statistics
+-------------------
 
 Once everything has been downloaded, use ```pits_stats``` to generate
 statistics for all the scores:
@@ -102,8 +101,8 @@ statistics for all the scores:
 
 This will produce a file ```stats.json``` inside the directory for each score.
 
-4. Combine statistics
-=====================
+Combine statistics
+------------------
 
 Finally, you can sum up all the stats produced into a single file:
 
@@ -112,7 +111,7 @@ Finally, you can sum up all the stats produced into a single file:
 This will produce a file named ```totalstats.json``` inside the catalog folder.
 
 What about a bit of data vizualisation ?
-========================================
+----------------------------------------
 
 If you have [matplotlib](http://matplotlib.org) installed, copy/paste this
 snippet of code in a python shell:
