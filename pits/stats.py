@@ -91,7 +91,7 @@ def analyze(filepath, search, output):
 
 @cli.command()
 @click.argument('directory', type=click.Path(exists=True))
-@click.option('--output', '-o', type=click.Path(), default='combined.json')
+@click.option('--output', '-o', type=click.Path(), default='totalstats.json')
 def combine(directory, output):
     total = Counter()
     for root, dirnames, filenames in os.walk(directory):
