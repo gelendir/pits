@@ -99,7 +99,8 @@ def combine(directory, output):
             filepath = os.path.join(root, filename)
             logging.debug("reading %s", filepath)
             with open(filepath) as f:
-                stats = {int(key): value for key, value in json.loads(f.read()).items()}
+                raw_stats = json.loads(f.read())
+                stats = {int(key): value for key, value in raw_stats.items()}
                 total += Counter(stats)
 
     print_stats(total)
