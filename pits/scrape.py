@@ -20,9 +20,12 @@ def cli(debug):
 
 @cli.command()
 @click.argument('filepath', type=click.Path(exists=True))
-@click.option('--output', '-o', default='catalog.json', type=click.Path())
-@click.option('--merge', '-m', type=click.Path(exists=True))
+@click.option('--output', '-o', default='catalog.json', type=click.Path(),
+              help="Write catalog to this file")
+@click.option('--merge', '-m', type=click.Path(exists=True),
+              help="Merge catalog with this file before writing")
 def scrape(filepath, output, merge):
+    """Convert Mutopia HTML catalog into JSON"""
     pieces = tuple(scrape_catalog(filepath))
     catalog = {'catalog': pieces,
                'whitelist': []}
@@ -64,13 +67,15 @@ def extract_info(cells):
 
 
 @cli.command()
-@click.argument('catalogpath', type=click.Path(exists=True))
-@click.option('--output', '-o', default='scores', type=click.Path())
-def download(catalogpath, output):
+@click.argument('catalogfile', type=click.Path(exists=True))
+@click.option('--output', '-o', default='scores', type=click.Path(),
+              help="Download scores to this directory")
+def download(catalogfile, output):
+    """Download scores from a JSON catalog"""
     if not os.path.exists(output):
         os.mkdir(output)
 
-    with open(catalogpath) as f:
+    with open(catalogfile) as f:
         catalog = json.loads(f.read())
 
     for score in catalog['catalog']:

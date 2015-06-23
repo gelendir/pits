@@ -60,13 +60,15 @@ def cli(debug):
 @cli.command()
 @click.argument('filepath', type=click.Path(exists=True))
 def pprint(filepath):
+    """Pretty-print MIDI file. Used for debugging purposes"""
     mid = mido.MidiFile(filepath)
     mid.print_tracks()
 
 
 @cli.command()
 @click.argument('directory', type=click.Path(exists=True))
-def catalog(directory):
+def scan(directory):
+    """Analyze all pieces for a catalog and produce stats"""
     catalog_path = os.path.join(directory, 'catalog.json')
     with open(catalog_path) as f:
         catalog = json.loads(f.read())
@@ -79,9 +81,12 @@ def catalog(directory):
 
 @cli.command()
 @click.argument('filepath', type=click.Path(exists=True))
-@click.option('--search/--no-search', default=False)
-@click.option('--output', '-o', type=click.Path(), default='stats.json')
+@click.option('--search/--no-search', default=False,
+              help="Search for tracks that look like a piano part")
+@click.option('--output', '-o', type=click.Path(), default='stats.json',
+              help="Write generated stats to this file")
 def analyze(filepath, search, output):
+    """Analyze a MIDI file and produce stats"""
     stats = analyze_file(filepath, search)
     print_stats(stats)
 
@@ -91,8 +96,10 @@ def analyze(filepath, search, output):
 
 @cli.command()
 @click.argument('directory', type=click.Path(exists=True))
-@click.option('--output', '-o', type=click.Path(), default='totalstats.json')
+@click.option('--output', '-o', type=click.Path(), default='totalstats.json',
+              help="Write totals to this file")
 def combine(directory, output):
+    """Combine all stats generated in a catalog and produce totals"""
     total = Counter()
     for root, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, 'stats.json'):
