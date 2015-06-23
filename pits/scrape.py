@@ -80,7 +80,7 @@ def download(catalogpath, output):
 def download_score(score, output):
     logging.info("downloading %s", score['title'])
 
-    path = os.path.join(score['short_author'], score['short_title'])
+    path = os.path.join(output, score['short_author'], score['short_title'])
     if not os.path.exists(path):
         os.makedirs(path)
 
