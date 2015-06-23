@@ -73,16 +73,16 @@ def catalog(directory):
 
     for piece in catalog['catalog']:
         piece_path = os.path.join(directory, piece['short_author'], piece['short_title'])
-        extract = (piece['instrument'] in catalog['whitelist'])
-        analyze_piece(piece, piece_path, extract)
+        search = (piece['instrument'] not in catalog['whitelist'])
+        analyze_piece(piece, piece_path, search)
 
 
 @cli.command()
 @click.argument('filepath', type=click.Path(exists=True))
-@click.option('--extract', '-e', is_flag=True, default=False)
+@click.option('--search/--no-search', default=False)
 @click.option('--output', '-o', type=click.Path(), default='stats.json')
-def analyze(filepath, extract, output):
-    stats = analyze_file(filepath, extract)
+def analyze(filepath, search, output):
+    stats = analyze_file(filepath, search)
     print_stats(stats)
 
     with open(output, 'w', encoding="utf-8") as f:
@@ -107,7 +107,7 @@ def combine(directory, output):
         f.write(json.dumps(total))
 
 
-def analyze_piece(piece, path, extract):
+def analyze_piece(piece, path, search):
     logging.info("analyzing %s", path)
 
     stat_path = os.path.join(path, 'stats.json')
@@ -117,7 +117,7 @@ def analyze_piece(piece, path, extract):
 
     with extract_midi_files(piece, path) as midi_files:
         total = Counter()
-        stats = (analyze_file(midi_file, extract) for midi_file in midi_files)
+        stats = (analyze_file(midi_file, search) for midi_file in midi_files)
         for count in stats:
             total += count
 
@@ -125,13 +125,13 @@ def analyze_piece(piece, path, extract):
             f.write(json.dumps(total))
 
 
-def analyze_file(filepath, extract):
-    logging.debug("analyzing file %s extract %s", filepath, extract)
+def analyze_file(filepath, search):
+    logging.debug("analyzing file %s. search: %s", filepath, search)
 
     mid = mido.MidiFile(filepath)
 
-    if extract:
-        tracks = extract_tracks(mid.tracks)
+    if search:
+        tracks = find_piano_tracks(mid.tracks)
     else:
         tracks = mid.tracks
 
@@ -153,16 +153,16 @@ def extract_midi_files(piece, path):
                    for name in zipfile.namelist()]
 
 
-def extract_tracks(tracks):
+def find_piano_tracks(tracks):
     analyzers = [TrackAnalyzer(t) for t in tracks]
     pianos = [a.track for a in analyzers if a.has_instrument()]
     polyphonic = (a.track for a in analyzers if a.has_polyphony())
 
     if pianos:
-        logging.debug("guessing that midi has piano tracks")
+        logging.debug("search found tracks marked as a piano instrument")
         yield from pianos
     else:
-        logging.debug("guessing midi has polyphonic tracks")
+        logging.debug("search found polyphonic tracks")
         yield from polyphonic
 
 
