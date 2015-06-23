@@ -10,19 +10,26 @@ MUTOPIA_URL = "http://www.mutopiaproject.org"
 
 
 @click.group()
-@click.option('--debug', '-d', is_flag=True, default=False)
+@click.option('--debug/--no-debug', default=False)
 def cli(debug):
     level = logging.DEBUG if debug else logging.INFO
+    requests_level = logging.DEBUG if debug else logging.WARN
     logging.basicConfig(level=level)
+    logging.getLogger('requests').setLevel(requests_level)
 
 
 @cli.command()
 @click.argument('filepath', type=click.Path(exists=True))
 @click.option('--output', '-o', default='catalog.json', type=click.Path())
-def scrape(filepath, output):
+@click.option('--merge', '-m', type=click.Path(exists=True))
+def scrape(filepath, output, merge):
     pieces = tuple(scrape_catalog(filepath))
     catalog = {'catalog': pieces,
                'whitelist': []}
+
+    if merge:
+        with open(merge) as f:
+            catalog.update(json.loads(f.read()))
 
     with open(output, 'w') as f:
         f.write(json.dumps(catalog, indent=4, separators=(',', ': ')))
