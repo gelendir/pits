@@ -51,7 +51,7 @@ class TrackAnalyzer(object):
 
 
 @click.group()
-@click.argument('--debug', '-d', is_flag=True, default=False)
+@click.option('--debug/--no-debug', default=False)
 def cli(debug):
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(level=level)
